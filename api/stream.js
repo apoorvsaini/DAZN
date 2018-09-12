@@ -6,7 +6,7 @@ module.exports.start = async function (userId) {
         MongoClient.connect(Config.MONGO_URI, { useNewUrlParser: true }, function(err, db) {
             if (err) throw err;
             let dbo = db.db("dazn");
-            let query = {user_id: userId};
+            let query = { user_id: userId };
 
             dbo.collection("users").findOne(query, function(err, result) {
                 if (err) throw err;
@@ -21,8 +21,16 @@ module.exports.start = async function (userId) {
                 }
                 else {
                     // Create the user and a stream
-                    resolve('created');
-                    db.close();
+                    var obj = { user_id: userId };
+                    dbo.collection("users").insertOne(obj, function(err, res) {
+                        if (err) throw err;
+                        console.log("1 document inserted");
+
+                        // TODO: now add one to stream collection
+                        
+                        db.close();
+                        resolve('created');
+                    });
                 }
             });
         });
@@ -37,7 +45,7 @@ module.exports.end = async function (userId, streamId) {
         MongoClient.connect(Config.MONGO_URI, { useNewUrlParser: true }, function(err, db) {
             if (err) throw err;
             let dbo = db.db("dazn");
-            let query = {user_id: userId, stream_id: streamId};
+            let query = { user_id: userId, stream_id: streamId };
 
             dbo.collection("streams").deleteOne(query, function(err, obj) {
                 if (err) {
