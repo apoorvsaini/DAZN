@@ -71,10 +71,11 @@ For deciding the end-points, I assumed that there must be two end-points, one to
 Although I am using sharded and multi-node MongoDB cluster and the server that I wrote can scale horizontally as micro-service (use load balancers in front), there are other things that can be done.
 
 * We can containerize it, use Docker
-* Use in-memory data-stores like redis to hold current count of running stream for users can be beneficial, although I doubt it will have a great effect as caching is more useful in read-heavy cases, which does not quite fit our scope
+* Use in-memory data-stores like redis to hold current count of running stream for users can be beneficial, although I doubt it will have a great effect as caching is more useful in read-heavy cases, which does not quite fit our problem
+* Use master-master replication for the DB, to increase the availability, in case of high amount of requests
 
 ## To Do
 
 * A little bit more refractoring
 * Containarize the service
-* Add a few exception handlers
+* Add exception handlers and add Unit Tests for start, stop and subsequent modules, i.e. for production, it is always important to have TDD based approach, which I did not choose to do for this assignment
