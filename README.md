@@ -32,7 +32,11 @@ I could have used POST/PUT or DELETE to make appropriate API endpoints but I cho
 
 The responses from the API endpoints are in the following format:
 
-> {"status":"success/error", "streams":1, "stream_id":"1213414921_597_274", "message":"New Stream started succesfully"}
+> {"status":"success", "streams":1, "stream_id":"1213414921_597_274", "message":"New Stream started succesfully"}
+
+Error responses will follow the same format:
+
+> {"status":"error", "streams":3, "stream_id":"", "message":"Maximum streaming limit reached"}
 
 ## Structure
 
