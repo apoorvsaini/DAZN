@@ -9,15 +9,33 @@ const server = Hapi.server({
     port: Config.PORT
 });
 
-// Stream Endpoint
+/*
+    -------------------------- Stream Endpoints --------------------------
+*/
+
+// Stream Start Endpoint
 server.route({
     method:'GET',
-    path:'/start/{userId}',
+    path:'/stream/start/{userId}',
     handler:function(request, h) {
 
         return `Hello ${encodeURIComponent(request.params.userId)}!`;
     }
 });
+
+// Stream Close Endpoint
+server.route({
+    method:'GET',
+    path:'/stream/stop/{userId}',
+    handler:function(request, h) {
+
+        return `STOP ${encodeURIComponent(request.params.userId)}!`;
+    }
+});
+
+/*
+    -----------------------------------------------------------------------
+*/
 
 // Start the server
 async function start() {
