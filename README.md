@@ -30,7 +30,7 @@ I could have used POST/PUT or DELETE to make appropriate API endpoints but I cho
 
 ## Structure
 
-  .
+    .
     ├── server.js
     ├── config.js                 # Contains IP, PORT and server configs
     ├── utils
