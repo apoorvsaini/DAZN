@@ -31,7 +31,8 @@ I could have used POST/PUT or DELETE to make appropriate API endpoints but I cho
 ### Response Format
 
 The responses from the API endpoints are in the following format:
-{"status":"success/error","streams":1,"stream_id":"1213414921_597_274","message":"New Stream started succesfully"}
+
+> {"status":"success/error", "streams":1, "stream_id":"1213414921_597_274", "message":"New Stream started succesfully"}
 
 ## Structure
 
