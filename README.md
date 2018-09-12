@@ -11,7 +11,7 @@ Clone the repository and use the termincal to go to the project's root.
 From terminal run the following commands:
 
 > npm i
->
+
 > npm start
 
 The server will expose the endpoints at http://127.0.0.1:3000. The port can be changed from config.js file.
@@ -32,6 +32,7 @@ I could have used POST/PUT or DELETE to make appropriate API endpoints but I cho
 
     .
     ├── server.js
+    ├── package.json              # NPM packages
     ├── config.js                 # Contains IP, PORT and server configs
     ├── utils
     │   └── constants.js          # Contains string and Object constants
