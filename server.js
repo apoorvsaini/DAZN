@@ -28,10 +28,10 @@ server.route({
 // Stream Close Endpoint
 server.route({
     method:'GET',
-    path:'/stream/stop/{userId}',
+    path:'/stream/stop/{userId}/{streamId}',
     handler:function(request, h) {
 
-        let result = Stream.end(encodeURIComponent(request.params.userId));
+        let result = Stream.end(encodeURIComponent(request.params.userId), encodeURIComponent(request.params.streamId));
         return result;
     }
 });
