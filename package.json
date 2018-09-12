@@ -1,0 +1,16 @@
+{
+  "name": "dazn",
+  "version": "0.0.1",
+  "description": "DAZN challenge",
+  "main": "server.js",
+  "scripts": {
+    "run": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Apoorv Saini",
+  "license": "ISC",
+  "dependencies": {
+    "hapi": "^17.5.4",
+    "npm": "^6.4.1"
+  }
+}
