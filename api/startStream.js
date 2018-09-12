@@ -3,9 +3,15 @@ const Constants = require('../utils/constants');
 let MongoClient = require('mongodb').MongoClient;
 
 /*
-    -------------------------- Stream Start Function --------------------------
+* Start the stream for the userId
+* If the number of streams on MongoDB == 3, give error
+* Else, give an error
+* 
+* If the userId is not present in MongoDb then create a new user 
+* and, add a stream in Stream Collections
 */
-module.exports.start = async function (userId) {
+
+module.exports = async function (userId) {
     let promise = new Promise((resolve, reject) => {
         MongoClient.connect(Config.MONGO_URI, { useNewUrlParser: true }, function(err, db) {
             if (err) throw err;
@@ -84,55 +90,3 @@ module.exports.start = async function (userId) {
     let result = await promise;
     return result;
 };
-
-/*
-    ------------------------------------------------------------------------------
-*/
-
-
-/*
-    -------------------------- Stream Start Function --------------------------
-*/
-module.exports.end = async function (userId, streamId) {
-    let promise = new Promise((resolve, reject) => {
-        MongoClient.connect(Config.MONGO_URI, { useNewUrlParser: true }, function(err, db) {
-            if (err) throw err;
-            let dbo = db.db(Config.MONGODB_COLLECTION);
-            let query = { user_id: userId, stream_id: streamId };
-            let jsonResult = Object.assign({}, Constants.STREAM_RESULT);
-
-            dbo.collection(Constants.STREAMS).findOne(query, function(err, res) {
-                if (res === null) {
-                    db.close();
-                    jsonResult['status'] = 'error';
-                    jsonResult['stream_id'] = streamId;
-                    jsonResult['streams'] = '';
-                    jsonResult['message'] = Constants.WENT_WRONG;
-    
-                    resolve(jsonResult);
-                }
-                else {
-                    dbo.collection(Constants.STREAMS).deleteOne(query, function(err, res) {
-                        if (err) throw err;
-                        db.close();
-        
-                        jsonResult['status'] = 'success';
-                        jsonResult['stream_id'] = streamId;
-                        jsonResult['streams'] = '';
-                        jsonResult['message'] = Constants.STREAM_DELETED;
-        
-                        resolve(jsonResult);
-                        
-                    });
-                }
-            });
-        });
-    });
-
-    let result = await promise;
-    return result;
-};
-
-/*
-    ------------------------------------------------------------------------------
-*/

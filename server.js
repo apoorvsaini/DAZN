@@ -2,7 +2,8 @@
 
 const Hapi = require('hapi');
 const Config = require('./config');
-const Stream = require('./api/stream');
+const StartStream = require('./api/startStream');
+const StopStream = require('./api/stopStream');
 
 // Create a server with a host and port
 const server = Hapi.server({
@@ -20,7 +21,7 @@ server.route({
     path:'/stream/start/{userId}',
     handler:function(request, h) {
         
-        let result = Stream.start(encodeURIComponent(request.params.userId));
+        let result = StartStream(encodeURIComponent(request.params.userId));
         return result;
     }
 });
@@ -31,7 +32,7 @@ server.route({
     path:'/stream/stop/{userId}/{streamId}',
     handler:function(request, h) {
 
-        let result = Stream.end(encodeURIComponent(request.params.userId).trim(), encodeURIComponent(request.params.streamId).trim());
+        let result = StopStream(encodeURIComponent(request.params.userId).trim(), encodeURIComponent(request.params.streamId).trim());
         return result;
     }
 });
