@@ -7,3 +7,7 @@
 Uses MongoDB service (Atlas) to track users and streams
 
 Creates the user, if not already in the database (for now)
+
+## Scaling
+
+Use caches
