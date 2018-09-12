@@ -21,7 +21,7 @@ server.route({
     path:'/stream/start/{userId}',
     handler:function(request, h) {
         
-        let result = StartStream(encodeURIComponent(request.params.userId));
+        let result = StartStream(encodeURIComponent(request.params.userId).trim());
         return result;
     }
 });
