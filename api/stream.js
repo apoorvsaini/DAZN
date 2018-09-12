@@ -1,14 +1,16 @@
 const Config = require('../config');
+const Strings = require('../utils/strings');
 let MongoClient = require('mongodb').MongoClient;
+
 
 module.exports.start = async function (userId) {
     let promise = new Promise((resolve, reject) => {
         MongoClient.connect(Config.MONGO_URI, { useNewUrlParser: true }, function(err, db) {
             if (err) throw err;
-            let dbo = db.db("dazn");
+            let dbo = db.db(Config.MONGODB_COLLECTION);
             let query = { user_id: userId };
 
-            dbo.collection("users").findOne(query, function(err, result) {
+            dbo.collection(Strings.USERS).findOne(query, function(err, result) {
                 if (err) throw err;
                 
                 console.log(result);
@@ -22,7 +24,7 @@ module.exports.start = async function (userId) {
                 else {
                     // Create the user and a stream
                     var obj = { user_id: userId };
-                    dbo.collection("users").insertOne(obj, function(err, res) {
+                    dbo.collection(Strings.USERS).insertOne(obj, function(err, res) {
                         if (err) throw err;
                         console.log("1 document inserted");
 
@@ -44,10 +46,10 @@ module.exports.end = async function (userId, streamId) {
     let promise = new Promise((resolve, reject) => {
         MongoClient.connect(Config.MONGO_URI, { useNewUrlParser: true }, function(err, db) {
             if (err) throw err;
-            let dbo = db.db("dazn");
+            let dbo = db.db(Config.MONGODB_COLLECTION);
             let query = { user_id: userId, stream_id: streamId };
 
-            dbo.collection("streams").deleteOne(query, function(err, obj) {
+            dbo.collection(Strings.STREAMS).deleteOne(query, function(err, obj) {
                 if (err) {
                     resolve('error');
                     db.close();
