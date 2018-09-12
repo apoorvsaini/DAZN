@@ -8,27 +8,38 @@ module.exports.start = async function (userId) {
         MongoClient.connect(Config.MONGO_URI, { useNewUrlParser: true }, function(err, db) {
             if (err) throw err;
             let dbo = db.db(Config.MONGODB_COLLECTION);
-            let query = { user_id: userId };
+            let query = streamQuery = { user_id: userId };
 
             dbo.collection(Strings.USERS).findOne(query, function(err, result) {
                 if (err) throw err;
-                
-                console.log(result);
-                console.log(userId);
+
+                // Pre-populate the stream id
+                streamQuery['stream_id'] = userId + '_' + Math.floor((Math.random() * 100) + 1) + '_' + Math.floor((Math.random() * 100) + 1);
                 
                 if (result !== null) {
-                    // User found, now check the streams
-                    resolve('found');
+                    // TODO: User found, now check the number streams
+
+                    // Add one to stream collection
+                    dbo.collection(Strings.STREAMS).insertOne(streamQuery, function(err, result) {
+                        if (err) throw err;
+                        console.log("stream id: " + streamQuery['stream_id']);
+                    });
+
                     db.close();
+                    resolve('found');
                 }
                 else {
                     // Create the user and a stream
-                    var obj = { user_id: userId };
-                    dbo.collection(Strings.USERS).insertOne(obj, function(err, res) {
+                    let userobj = { user_id: userId };
+                    dbo.collection(Strings.USERS).insertOne(userobj, function(err, res) {
                         if (err) throw err;
                         console.log("1 document inserted");
 
-                        // TODO: now add one to stream collection
+                        // Add one to stream collection
+                        dbo.collection(Strings.STREAMS).insertOne(streamQuery, function(err, result) {
+                            if (err) throw err;
+                            console.log("stream id: " + streamQuery['stream_id']);
+                        });
                         
                         db.close();
                         resolve('created');
