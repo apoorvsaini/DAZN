@@ -35,7 +35,7 @@ module.exports.start = async function (userId) {
                             jsonResult['status'] = 'error';
                             jsonResult['streams'] = result;
                             jsonResult['message'] = Constants.MAX_STREAMS;
-                            
+
                             resolve(jsonResult);
                         }
                         else {
@@ -95,25 +95,29 @@ module.exports.end = async function (userId, streamId) {
             let query = { user_id: userId, stream_id: streamId };
             let jsonResult = Object.assign({}, Constants.STREAM_RESULT);
 
-            dbo.collection(Constants.STREAMS).deleteOne(query, function(err, obj) {
-                if (err) {
+            dbo.collection(Constants.STREAMS).findOne(query, function(err, res) {
+                if (res === null) {
                     db.close();
                     jsonResult['status'] = 'error';
                     jsonResult['stream_id'] = streamId;
                     jsonResult['streams'] = '';
                     jsonResult['message'] = Constants.WENT_WRONG;
-
+    
                     resolve(jsonResult);
                 }
                 else {
-                    db.close();
-
-                    jsonResult['status'] = 'success';
-                    jsonResult['stream_id'] = streamId;
-                    jsonResult['streams'] = '';
-                    jsonResult['message'] = Constants.STREAM_DELETED;
-
-                    resolve(jsonResult);
+                    dbo.collection(Constants.STREAMS).deleteOne(query, function(err, res) {
+                        if (err) throw err;
+                        db.close();
+        
+                        jsonResult['status'] = 'success';
+                        jsonResult['stream_id'] = streamId;
+                        jsonResult['streams'] = '';
+                        jsonResult['message'] = Constants.STREAM_DELETED;
+        
+                        resolve(jsonResult);
+                        
+                    });
                 }
             });
         });
