@@ -7,6 +7,8 @@ module.exports.start = async function (userId) {
     let promise = new Promise((resolve, reject) => {
         MongoClient.connect(Config.MONGO_URI, { useNewUrlParser: true }, function(err, db) {
             if (err) throw err;
+
+            let streamCount = 0
             let dbo = db.db(Config.MONGODB_COLLECTION);
             let query = { user_id: userId };
             let streamQuery = { user_id: userId, stream_id: '' };
@@ -15,6 +17,7 @@ module.exports.start = async function (userId) {
             let random1 = Math.floor((Math.random() * 100) + 1);
             let random2 = Math.floor((Math.random() * 100) + 1);
             streamQuery['stream_id'] = userId + '_' + random1 + '_' + random2;
+            let jsonResult = Object.assign({}, Constants.STREAM_RESULT);
 
             dbo.collection(Constants.USERS).findOne(query, function(err, result) {
                 if (err) throw err;       
@@ -23,30 +26,35 @@ module.exports.start = async function (userId) {
                     // TODO: User found, now check the number streams
                     dbo.collection(Constants.STREAMS).count(query, function(err, result) {
                         if (err) throw err;
+                        streamCount = result;
                         
-                        if (result >= 3) {
-                            let result = Object.assign({}, Constants.STREAM_RESULT);
-                            result['status'] = 'error';
-                            result['streams'] = result;
-                            result['message'] = Constants.MAX_STREAMS;
+                        console.log(query);
+                        console.log(streamCount);
+
+                        if (streamCount >= 3) {
+                            jsonResult['status'] = 'error';
+                            jsonResult['streams'] = result;
+                            jsonResult['message'] = Constants.MAX_STREAMS;
                             
-                            resolve(result);
+                            resolve(jsonResult);
+                        }
+                        else {
+                            // Add one to stream collection
+                            dbo.collection(Constants.STREAMS).insertOne(streamQuery, function(err, result) {
+                                if (err) throw err;
+                            });
+
+                            db.close();
+
+                            // Build the result
+                            jsonResult['status'] = 'success';
+                            jsonResult['stream_id'] = streamQuery['stream_id'];
+                            jsonResult['streams'] = streamCount + 1;
+                            jsonResult['message'] = Constants.STREAM_ADDED;
+
+                            resolve(jsonResult);
                         }
                     });
-
-                    // Add one to stream collection
-                    dbo.collection(Constants.STREAMS).insertOne(streamQuery, function(err, result) {
-                        if (err) throw err;
-                    });
-
-                    db.close();
-
-                    // Build the result
-                    Constants.STREAM_RESULT['status'] = 'success';
-                    Constants.STREAM_RESULT['streams'] = 1;
-                    Constants.STREAM_RESULT['stream_id'] = streamQuery['stream_id'];
-                    Constants.STREAM_RESULT['message'] = Constants.STREAM_ADDED;
-                    resolve(Constants.STREAM_RESULT);
                 }
                 else {
                     // Create the user and a stream
@@ -63,12 +71,12 @@ module.exports.start = async function (userId) {
                         db.close();
 
                         // Build the result
-                        Constants.STREAM_RESULT['stream_ids'] = new Array();
-                        Constants.STREAM_RESULT['status'] = 'success';
-                        Constants.STREAM_RESULT['streams'] = 1;
-                        Constants.STREAM_RESULT['stream_id'] = streamQuery['stream_id'];
-                        Constants.STREAM_RESULT['message'] = Constants.USER_CREATED + ' ' + Constants.STREAM_ADDED;
-                        resolve(Constants.STREAM_RESULT);
+                        jsonResult['status'] = 'success';
+                        jsonResult['stream_id'] = streamQuery['stream_id'];
+                        jsonResult['streams'] = 1;
+                        jsonResult['message'] = Constants.USER_CREATED + ' & ' + Constants.STREAM_ADDED;
+
+                        resolve(jsonResult);
                     });
                 }
             });
@@ -85,15 +93,27 @@ module.exports.end = async function (userId, streamId) {
             if (err) throw err;
             let dbo = db.db(Config.MONGODB_COLLECTION);
             let query = { user_id: userId, stream_id: streamId };
+            let jsonResult = Object.assign({}, Constants.STREAM_RESULT);
 
             dbo.collection(Constants.STREAMS).deleteOne(query, function(err, obj) {
                 if (err) {
-                    resolve('error');
                     db.close();
+                    jsonResult['status'] = 'error';
+                    jsonResult['stream_id'] = streamId;
+                    jsonResult['streams'] = '';
+                    jsonResult['message'] = Constants.WENT_WRONG;
+
+                    resolve(jsonResult);
                 }
                 else {
-                    resolve('deleted');
                     db.close();
+
+                    jsonResult['status'] = 'success';
+                    jsonResult['stream_id'] = streamId;
+                    jsonResult['streams'] = '';
+                    jsonResult['message'] = Constants.STREAM_DELETED;
+
+                    resolve(jsonResult);
                 }
             });
         });
