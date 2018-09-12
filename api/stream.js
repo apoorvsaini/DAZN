@@ -60,7 +60,6 @@ module.exports.start = async function (userId) {
                     let userobj = { user_id: userId };
                     dbo.collection(Constants.USERS).insertOne(userobj, function(err, res) {
                         if (err) throw err;
-                        console.log("1 document inserted");
 
                         // Add one to stream collection
                         dbo.collection(Constants.STREAMS).insertOne(streamQuery, function(err, result) {

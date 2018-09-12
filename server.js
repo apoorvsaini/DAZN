@@ -31,7 +31,7 @@ server.route({
     path:'/stream/stop/{userId}/{streamId}',
     handler:function(request, h) {
 
-        let result = Stream.end(encodeURIComponent(request.params.userId), encodeURIComponent(request.params.streamId));
+        let result = Stream.end(encodeURIComponent(request.params.userId).trim(), encodeURIComponent(request.params.streamId).trim());
         return result;
     }
 });
